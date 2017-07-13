@@ -1,7 +1,6 @@
 class Dealer < Player
-
   def display
-    puts "#{@name}"
+    puts @name.to_s
     @hand.each.with_index(1) { |_card, index| puts "#{index}-я карта - *" }
   end
 

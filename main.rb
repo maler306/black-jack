@@ -4,8 +4,8 @@ require_relative 'user'
 require_relative 'game'
 require_relative 'cards'
 
-  game = Game.new
+game = Game.new
 
-  loop do
-    game.set
-  end
+loop do
+  game.set
+end

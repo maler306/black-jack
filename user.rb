@@ -1,3 +1,2 @@
 class User < Player
-
 end

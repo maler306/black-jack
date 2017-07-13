@@ -6,10 +6,10 @@ class Game < Player
   attr_reader :user, :dealer, :hand, :cards
 
   def initialize
-    @user=check_in
-    @user.account=100
-    @dealer=Dealer.new
-    @dealer.account=100
+    @user = check_in
+    @user.account = 100
+    @dealer = Dealer.new
+    @dealer.account = 100
     new_cards
     @pot = 0
   end
@@ -36,7 +36,7 @@ class Game < Player
   private
 
   def new_cards
-    @cards=Cards.new
+    @cards = Cards.new
   end
 
   def add_card(player)
@@ -44,13 +44,13 @@ class Game < Player
     cards_off if @cards.deck.size < 2
     player.hand.merge!(cards.cards_deal)
     player.count
-    open_cards if (@user.hand.size && @dealer.hand.size == 3) || player.sum>21
+    open_cards if (@user.hand.size && @dealer.hand.size == 3) || player.sum > 21
   end
 
   def add_to_user
     add_card(@user)
     @user.display
-    puts "Ход дилера!"
+    puts 'Ход дилера!'
     sleep 3
     dealer_choice
   end
@@ -61,7 +61,7 @@ class Game < Player
       add_bet(player)
     end
     2.times do
-    [@user, @dealer].each { |player| add_card(player) }
+      [@user, @dealer].each { |player| add_card(player) }
     end
   end
 
@@ -78,9 +78,9 @@ class Game < Player
   end
 
   def drow
-    [@user, @dealer].each { |player| player.account += @pot/2 }
+    [@user, @dealer].each { |player| player.account += @pot / 2 }
     @pot = 0
-    puts "Ничья!"
+    puts 'Ничья!'
   end
 
   def up_cards
@@ -104,11 +104,11 @@ class Game < Player
 
   def dealer_choice
     return false if @dealer.hand.count > 2
-      if @dealer.sum < 18
-        add_card(@dealer)
-        puts "Дилер: ещё одну карту!"
-      else (puts "Дилер: \"пропускаю\"")
-      end
+    if @dealer.sum < 18
+      add_card(@dealer)
+      puts 'Дилер: ещё одну карту!'
+    else (puts 'Дилер: "пропускаю"')
+    end
   end
 
   def clean_hands
@@ -118,8 +118,8 @@ class Game < Player
   end
 
   def cards_off
-    puts "Колода карт закончилась!"
-    puts "Новая колода карт в игре!"
+    puts 'Колода карт закончилась!'
+    puts 'Новая колода карт в игре!'
     new_cards
   end
 
@@ -131,39 +131,38 @@ class Game < Player
 
   def render(method)
     send(method)
-    rescue RuntimeError, TypeError => e
+  rescue RuntimeError, TypeError => e
     puts e.message
   end
 
   def show
-  [@user, @dealer].each { |player| player.display}
+    [@user, @dealer].each(&:display)
   end
 
   def round
-    until @user.hand.size > 2 || (@user.sum || @dealer.sum) >=21
-    show
-    choices
-    user_choice = gets.chomp
-    self.action(user_choice)
+    until @user.hand.size > 2 || (@user.sum || @dealer.sum) >= 21
+      show
+      choices
+      user_choice = gets.chomp
+      action(user_choice)
     end
     open_cards
   end
 
   def new_round
-    puts "Новый раунд!"
+    puts 'Новый раунд!'
     first_deal
   end
 
   def question
-    puts "Продолжим?"
-    puts "\"Enter\" для продолжения или любой знак для завершения игры!"
+    puts 'Продолжим?'
+    puts '"Enter" для продолжения или любой знак для завершения игры!'
     pick = gets.chomp
-      if pick == ""
-        puts "Продолжаем"
-      else
-        @user.display
-        raise  "Игра завершена"
-      end
+    if pick == ''
+      puts 'Продолжаем'
+    else
+      @user.display
+      raise 'Игра завершена'
+    end
   end
-
 end
