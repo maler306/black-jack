@@ -1,16 +1,39 @@
 class Game < Player
+  OBJECT_ERROR = 'Ошибка ввода!'.freeze
+  MAIN_ACTIONS = { '1' => :add_to_user, '2' => :dealer_choice, '3' => :open_cards, '4' => :abort }.freeze
   BET = 10
   attr_accessor :account, :pot
   attr_reader :user, :dealer, :hand, :cards
 
-  def initialize(user)
-    @user=user
+  def initialize
+    @user=check_in
     @user.account=100
     @dealer=Dealer.new
     @dealer.account=100
     new_cards
     @pot = 0
   end
+
+  def set
+    new_round
+    round
+    question
+  end
+
+  def choices
+    puts 'Выберите действие'
+    puts '1-- добавить карту.'
+    puts '2-- пропустить ход'
+    puts '3-- открыть карты'
+    puts '4-- выход'
+  end
+
+  def action(user_choice)
+    act = MAIN_ACTIONS.fetch(user_choice) { puts 'Некорректный ввод, выберите от 1 до 4' }
+    render(act)
+  end
+
+  private
 
   def new_cards
     @cards=Cards.new
@@ -21,15 +44,24 @@ class Game < Player
     cards_off if @cards.deck.size < 2
     player.hand.merge!(cards.cards_deal)
     player.count
+    open_cards if (@user.hand.size && @dealer.hand.size == 3) || player.sum>21
+  end
+
+  def add_to_user
+    add_card(@user)
+    @user.display
+    puts "Ход дилера!"
+    sleep 3
+    dealer_choice
   end
 
   def first_deal
     [@user, @dealer].each do |player|
       player.hand = {}
-      self.add_bet(player)
+      add_bet(player)
     end
     2.times do
-    [@user, @dealer].each { |player| self.add_card(player) }
+    [@user, @dealer].each { |player| add_card(player) }
     end
   end
 
@@ -63,15 +95,17 @@ class Game < Player
     elsif ((@user.sum < @dealer.sum) && @dealer.sum < 22) || @user.sum > 21
       win_round(@dealer)
     else
-      self.drow
+      drow
     end
-    self.clean_hands
+    clean_hands
+    question
+    new_round
   end
 
   def dealer_choice
     return false if @dealer.hand.count > 2
       if @dealer.sum < 18
-        self.add_card(@dealer)
+        add_card(@dealer)
         puts "Дилер: ещё одну карту!"
       else (puts "Дилер: \"пропускаю\"")
       end
@@ -87,6 +121,49 @@ class Game < Player
     puts "Колода карт закончилась!"
     puts "Новая колода карт в игре!"
     new_cards
+  end
+
+  def check_in
+    puts 'Введите имя'
+    name = gets.strip.capitalize
+    @user = User.new(name)
+  end
+
+  def render(method)
+    send(method)
+    rescue RuntimeError, TypeError => e
+    puts e.message
+  end
+
+  def show
+  [@user, @dealer].each { |player| player.display}
+  end
+
+  def round
+    until @user.hand.size > 2 || (@user.sum || @dealer.sum) >=21
+    show
+    choices
+    user_choice = gets.chomp
+    self.action(user_choice)
+    end
+    open_cards
+  end
+
+  def new_round
+    puts "Новый раунд!"
+    first_deal
+  end
+
+  def question
+    puts "Продолжим?"
+    puts "\"Enter\" для продолжения или любой знак для завершения игры!"
+    pick = gets.chomp
+      if pick == ""
+        puts "Продолжаем"
+      else
+        @user.display
+        raise  "Игра завершена"
+      end
   end
 
 end

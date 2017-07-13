@@ -1,5 +1,4 @@
 class Player
-
   attr_accessor :name, :account, :hand, :sum
 
   def initialize(name="Dealer")
@@ -13,7 +12,6 @@ class Player
     puts "#{@name}, на счету: #{@account}"
     @hand.each.with_index(1) { |(card, value), index| puts "#{index}-я карта - #{card} = #{value}" }#ACE=11
     puts "Количество очков: #{@sum}"
-    p @hand
   end
 
   def count
