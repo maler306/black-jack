@@ -1,4 +1,4 @@
-class Game < Player
+class Game
   OBJECT_ERROR = 'Ошибка ввода!'.freeze
   MAIN_ACTIONS = { '1' => :add_to_user, '2' => :dealer_choice, '3' => :open_cards, '4' => :abort }.freeze
   BET = 10
@@ -17,7 +17,6 @@ class Game < Player
   def set
     new_round
     round
-    question
   end
 
   def choices
@@ -41,10 +40,9 @@ class Game < Player
 
   def add_card(player)
     return false if player.hand.size > 2
-    cards_off if @cards.deck.size < 2
+    cards_off if @cards.deck.size < 6
     player.hand.merge!(cards.cards_deal)
     player.count
-    open_cards if (@user.hand.size && @dealer.hand.size == 3) || player.sum > 21
   end
 
   def add_to_user
@@ -99,14 +97,14 @@ class Game < Player
     end
     clean_hands
     question
-    new_round
+    set
   end
 
   def dealer_choice
     return false if @dealer.hand.count > 2
     if @dealer.sum < 18
-      add_card(@dealer)
       puts 'Дилер: ещё одну карту!'
+      add_card(@dealer)
     else (puts 'Дилер: "пропускаю"')
     end
   end
@@ -140,7 +138,7 @@ class Game < Player
   end
 
   def round
-    until @user.hand.size > 2 || (@user.sum || @dealer.sum) >= 21
+    until @user.hand.size > 2 || @user.sum>=21 || @dealer.sum >= 21
       show
       choices
       user_choice = gets.chomp

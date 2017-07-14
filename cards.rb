@@ -1,4 +1,4 @@
-class Cards < Game
+class Cards
   SUITS = %w[+ <3 <> ^].freeze
   HONEURS = %w[J Q K A].freeze
   ACE = /^A/
